@@ -1,6 +1,8 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id "org.jetbrains.kotlin.jvm" version "$kotlin_version"
 }
+
+description("OSGi Framework Wrapper")
 
 group 'net.corda'
 version '1.0-SNAPSHOT'
@@ -11,4 +13,10 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "ch.qos.logback:logback-classic:1.2.3"
+    implementation "org.slf4j:slf4j-api:$slf4j_version"
+    implementation "org.apache.felix:org.apache.felix.framework:$felix_version"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
 }
