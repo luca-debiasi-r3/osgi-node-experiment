@@ -1,6 +1,10 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id "biz.aQute.bnd.builder" version "5.1.2"
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.0'
 }
+
+description("OSGi Corda Node")
 
 group 'net.corda'
 version '1.0-SNAPSHOT'
@@ -9,6 +13,45 @@ repositories {
     mavenCentral()
 }
 
+//configurations {
+//
+//    [runtimeClasspath].forEach { cfg ->
+//        cfg.resolutionStrategy {
+//            dependencySubstitution {
+//                substitute module('org.jetbrains.kotlin:kotlin-stdlib-jdk8') with module("org.jetbrains.kotlin:kotlin-osgi-bundle:1.4.0")
+//                substitute module('org.jetbrains.kotlin:kotlin-stdlib-jdk7') with module("org.jetbrains.kotlin:kotlin-osgi-bundle:1.4.0")
+//                substitute module('org.jetbrains.kotlin:kotlin-stdlib-common') with module("org.jetbrains.kotlin:kotlin-osgi-bundle:1.4.0")
+//                substitute module('org.jetbrains.kotlin:kotlin-stdlib') with module("org.jetbrains.kotlin:kotlin-osgi-bundle:1.4.0")
+//                substitute module('org.jetbrains.kotlin:kotlin-reflect') with module("org.jetbrains.kotlin:kotlin-osgi-bundle:1.4.0")
+//            }
+//        }
+//    }
+//}
+
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    compileOnly "org.jetbrains.kotlin:kotlin-osgi-bundle:$kotlin_version"
+    compileOnly "org.osgi:osgi.core:$osgi_version"
+    compileOnly "org.slf4j:slf4j-api:$slf4j_version"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+
+jar {
+    bnd(
+            '-fixupmessages': '"Classes found in the wrong directory"; restrict:=error; is:=warning',
+            'Bundle-ManifestVersion': 2,
+            'Bundle-Name': 'OSGi Corda Node',
+            'Bundle-Description': 'OSGi Corda Node',
+            'Bundle-Vendor': 'R3',
+            'Bundle-Version': '1.0.0',
+            'Bundle-Activator': 'net.corda.osgi.node.NodeActivator',
+            'Import-Package': '''!kotlin.internal.jdk7, \
+                                 !kotlin.internal.jdk8,  \
+                                 org.osgi.framework;version="[1.9,2)", \
+                                 org.slf4j;version="[1.7,2)"
+                              '''
+    )
+    from {
+        configurations.runtimeClasspath.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
