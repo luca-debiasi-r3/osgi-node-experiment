@@ -1,5 +1,6 @@
 package net.corda.osgi.node
 
+import net.corda.core.crypto.Crypto
 import org.osgi.framework.BundleActivator
 import org.osgi.framework.BundleContext
 import org.slf4j.Logger
@@ -16,6 +17,9 @@ class NodeActivator : BundleActivator {
     override fun start(
             context: BundleContext?) {
         logger.info("Start...")
+        Crypto.registerProviders()
+        logger.info("Crypto provider registered")
+        logger.info("Started.")
     }
 
     override fun stop(

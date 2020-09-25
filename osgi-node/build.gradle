@@ -29,11 +29,28 @@ repositories {
 //}
 
 dependencies {
+    compileOnly "org.bouncycastle:bcprov-jdk15on:1.66"
     compileOnly "org.jetbrains.kotlin:kotlin-osgi-bundle:$kotlin_version"
     compileOnly "org.osgi:osgi.core:$osgi_version"
     compileOnly "org.slf4j:slf4j-api:$slf4j_version"
+    implementation files("/home/ldebiasi/corda/core/build/libs/corda-core-4.7-SNAPSHOT.jar")
+
+    implementation files(
+            "/home/ldebiasi/Downloads/bctest-jdk15on-166.jar",
+            "/home/ldebiasi/Downloads/bcpg-jdk15on-166.jar",
+            "/home/ldebiasi/Downloads/bcmail-jdk15on-166.jar",
+            "/home/ldebiasi/Downloads/bcpkix-jdk15on-166.jar",
+            "/home/ldebiasi/Downloads/bcprov-ext-jdk15on-166.jar"
+    )
+
+    implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation 'net.i2p.crypto:eddsa:0.3.0'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+
+/*
+javax.crypto.spec is only available in Oracle JVM.
+ */
 
 jar {
     bnd(
@@ -46,6 +63,7 @@ jar {
             'Bundle-Activator': 'net.corda.osgi.node.NodeActivator',
             'Import-Package': '''!kotlin.internal.jdk7, \
                                  !kotlin.internal.jdk8,  \
+                                 javax.crypto.spec, \
                                  org.osgi.framework;version="[1.9,2)", \
                                  org.slf4j;version="[1.7,2)"
                               '''
@@ -53,5 +71,10 @@ jar {
     from {
         configurations.runtimeClasspath.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    doLast {
+        copy {
+            from file("/home/ldebiasi/IdeaProjects/osgi-node-experiment/osgi-node/build/libs/osgi-node-1.0-SNAPSHOT.jar")
+            into file("/home/ldebiasi/IdeaProjects/osgi-node-experiment/osgi-wrap/src/main/resources/components/")
+        }
+    }
 }
-
